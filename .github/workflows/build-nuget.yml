@@ -1,0 +1,47 @@
+name: Build and Publish NuGet Packages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Checkout the repository code
+    - uses: actions/checkout@v4
+    
+    # Setup .NET SDK
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '9.0.x'
+        include-prerelease: true
+        
+    # Restore dependencies for the entire solution
+    - name: Restore
+      run: dotnet restore
+      
+    # Build all projects
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+      
+    # Pack ServerSentEvents.Abstractions (no dependencies)
+    - name: Pack Abstractions
+      run: dotnet pack ServerSentEvents.Abstractions/ServerSentEvents.Abstractions.csproj --configuration Release --no-build -p:PackageVersion=1.0.${{ github.run_number }}
+      
+    # Pack ServerSentEvents.Consumer (depends on Abstractions)
+    - name: Pack Consumer
+      run: dotnet pack ServerSentEvents.Consumer/ServerSentEvents.Consumer.csproj --configuration Release --no-build -p:PackageVersion=1.0.${{ github.run_number }}
+      
+    # Pack ServerSentEvents.Processor (depends on Abstractions)
+    - name: Pack Processor
+      run: dotnet pack ServerSentEvents.Processor/ServerSentEvents.Processor.csproj --configuration Release --no-build -p:PackageVersion=1.0.${{ github.run_number }}
+      
+    # Publish all packages to NuGet using a specific glob pattern
+    - name: Publish to NuGet
+      run: dotnet nuget push "**/bin/Release/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+      env:
+        NUGET_AUTH_TOKEN: ${{ secrets.NUGET_API_KEY }}
