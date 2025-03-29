@@ -1,0 +1,57 @@
+﻿@using Blazor.Models
+@using ServerSentEvents.Abstractions
+@using System.Text.Json
+
+@inherits LayoutComponentBase
+
+@Body
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@code {
+
+   [Inject] public IServerSentEventConsumer ServerSentEventClient { get; set; } = default!;
+
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     await base.OnAfterRenderAsync(firstRender);
+
+    //     if (firstRender)
+    //     {
+    //         Func<string, ReadOnlySpan<byte>, IServerSentEvent?> parser = (eventType, bytes) => eventType switch
+    //         {
+    //             nameof(WeatherForecast) => JsonSerializer.Deserialize<WeatherForecast>(bytes) as IServerSentEvent,
+    //             nameof(SportScore) => JsonSerializer.Deserialize<SportScore>(bytes) as IServerSentEvent,
+    //             nameof(ClearItems) => JsonSerializer.Deserialize<ClearItems>(bytes) as IServerSentEvent,
+    //             nameof(ServerSentEventHeartBeat) => JsonSerializer.Deserialize<ServerSentEventHeartBeat>(bytes) as IServerSentEvent,
+    //             nameof(ServerSentEventWelcome) => JsonSerializer.Deserialize<ServerSentEventWelcome>(bytes) as IServerSentEvent,
+    //             _ => null
+    //         };
+
+    //         await ServerSentEventClient.Start(parser);
+
+
+    //         // await ServerSentEventClient.Start<IServerSentEvent>(
+    //         //     typeof(WeatherForecast),
+    //         //     typeof(SportScore),
+    //         //     typeof(ClearItems),
+    //         //     typeof(ServerSentEventHeartBeat),
+    //         //     typeof(ServerSentEventWelcome)
+    //         // );
+
+
+    //         // await ServerSentEventClient.Start(
+    //         //     typeof(WeatherForecast),
+    //         //     typeof(SportScore),
+    //         //     typeof(ClearItems),
+    //         //     typeof(ServerSentEventHeartBeat),
+    //         //     typeof(ServerSentEventWelcome)
+    //         // );
+    //     }
+    // }
+}
+

@@ -1,0 +1,164 @@
+﻿@page "/"
+@using Blazor.Models
+@using ServerSentEvents.Abstractions
+@using ServerSentEvents.Consumer
+
+<PageTitle>Home</PageTitle>
+ 
+<div>
+    <button @onclick="SendWeather">Weather</button>
+    <button @onclick="SendSport">Sport</button>
+    <button @onclick="SendBulk">Send Bulk</button>
+    <button @onclick="ClearItems">Clear Items</button>
+</div>
+
+<p>
+    @welcomeMessage @totalMessages
+</p>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr 1fr;">
+    <div>
+        @foreach (var msg in wf)
+        {
+            <p>@msg.Summary</p>
+        }
+    </div>
+    <div>
+        @foreach (var msg in ss)
+        {
+            <p style="font-variant-numeric: tabular-nums;">@msg.Team1Score.ToString("000") - @msg.Team2Score.ToString("000")</p>
+        }
+    </div>
+    <div>
+        @foreach (var msg in de)
+        {
+            <p style="font-variant-numeric: tabular-nums;">@msg.Date.ToString("dd MMM yyyy : hh:mm:ss")</p>
+        }
+    </div>
+    <div>
+        @foreach (var msg in hb)
+        {
+            <p>@msg.Beat.ToString()</p>
+        }
+
+    </div>
+</div>
+
+@code {
+
+    [Inject] public IHttpClientFactory HttpClientFactory { get; set; } = default!;
+    [Inject] public IServerSentEventAggregator ServerSentEvents { get; set; } = default!;
+
+    private int totalMessages = 0;
+    private string welcomeMessage = string.Empty;
+
+    private List<WeatherForecast> wf = new();
+    private List<SportScore> ss = new();
+    private List<DemoEvent> de = new();
+    private List<ServerSentEventHeartBeat> hb = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            ServerSentEvents.Subscribe<ServerSentEventWelcome>(async welcome =>
+            {
+                totalMessages++;
+                welcomeMessage = welcome.Message;
+                await InvokeAsync(() => StateHasChanged());
+            });
+
+            ServerSentEvents.Subscribe<ServerSentEventHeartBeat>(async heartbeat =>
+            {
+                totalMessages++;
+                hb.Insert(0, heartbeat);
+                await InvokeAsync(() => StateHasChanged());
+            });
+
+            ServerSentEvents.Subscribe<WeatherForecast>(async forecast =>
+            {
+                totalMessages++;
+                hb.Clear();
+                wf.Clear();
+                ss.Clear();
+                wf.Insert(0, forecast);
+                await InvokeAsync(() => StateHasChanged());
+            });
+
+            ServerSentEvents.Subscribe<SportScore>(async score =>
+            {
+                totalMessages++;
+                hb.Clear();
+                wf.Clear();
+                ss.Clear();
+                ss.Insert(0, score);
+                await InvokeAsync(() => StateHasChanged());
+            });
+
+            ServerSentEvents.Subscribe<DemoEvent>(async score =>
+            {
+                totalMessages++;
+                hb.Clear();
+                wf.Clear();
+                ss.Clear();
+                de.Insert(0, score);
+                await InvokeAsync(() => StateHasChanged());
+            });
+
+            ServerSentEvents.Subscribe<ClearItems>(async score =>
+            {
+                totalMessages++;
+                hb.Clear();
+                wf.Clear();
+                ss.Clear();
+                await InvokeAsync(() => StateHasChanged());
+            });
+        }
+    }
+
+    private async Task SendSport(MouseEventArgs e)
+    {
+        var client = HttpClientFactory.CreateClient();
+        await client.GetAsync("/sport");
+    }
+
+    private async Task SendWeather(MouseEventArgs e)
+    {
+        var client = HttpClientFactory.CreateClient();
+        await client.GetAsync("/weather");
+    }
+
+    // private void UserLogout(MouseEventArgs e)
+    // {
+    //     var client = HttpClientFactory.CreateClient();
+    //     client.GetAsync("https://localhost:7285/account/fake-logout");
+    // }
+
+    // private void UserLogin(MouseEventArgs e)
+    // {
+    //     var client = HttpClientFactory.CreateClient();
+    //     client.GetAsync("https://localhost:7285/account/fake-login");
+    // }
+
+    private async Task SendBulk(MouseEventArgs args)
+    {
+        var rnd = Random.Shared.Next(100, 1000);
+        var client = HttpClientFactory.CreateClient();
+
+        for (int i = 0; i < rnd; i++)
+        {
+            var url = i % 2 == 0 ? "/weather" : "/sport";
+
+            await client.GetAsync(url);
+        }
+    }
+
+
+    private async Task ClearItems(MouseEventArgs e)
+    {
+        var client = HttpClientFactory.CreateClient();
+        await client.GetAsync("/clear-items");
+    }
+}
