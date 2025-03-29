@@ -27,17 +27,14 @@ public static class WebApplicationCollectionExtensions
             await response.WriteAsync($"\n\n");
             await response.Body.FlushAsync();
 
-            var connection = new ServerSentEventConnection(response, context.RequestAborted);
-            //connection.RemoveFromConnections = () => connections.Remove(connection);
-            connections.Add(connection);
-            //connection.StartHeartbeat(options, cancellationToken).SafeFireAndForget();
+            var connection = new ServerSentEventConnection(response, context.RequestAborted); 
+            connections.Add(connection); 
 
             try
             {
                 while (!context.RequestAborted.IsCancellationRequested)
                 {
-                    await Task.Delay(options.HeartBeatMilliseconds);
-                    // await channel.WriteAsync(new ServerSentEventHeartBeat());
+                    await Task.Delay(options.HeartBeatMilliseconds); 
                 }
             }
             catch (OperationCanceledException)

@@ -25,8 +25,7 @@ public class ServerSentEventProcessor : BackgroundService
             {
                 var connection = _connections.FirstOrDefault(connection => connection.Guid == item.Guid);
                 if (connection is not null)
-                {
-                    //await connection.KillHeartbeat();
+                { 
                     _connections.Remove(connection);
                 }
             }

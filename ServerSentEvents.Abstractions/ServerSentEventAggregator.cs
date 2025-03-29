@@ -23,16 +23,7 @@ public record ServerSentEventAggregator : IServerSentEventAggregator
             return;
 
         _subject.OnNext(@event!);
-    }
-
-    ///// <summary>
-    ///// Subscribes to events of type <typeparamref name="TEvent"/> and returns an observable for further filtering.
-    ///// </summary>
-    //public IObservable<TEvent> Subscribe<TEvent>(Action<TEvent> onNext)
-    //{
-    //    var observable = _subject.OfType<TEvent>().AsObservable();
-    //    return observable.Do(onNext); // Calls onNext when an event is received
-    //}
+    } 
 
     public IDisposable Subscribe<TEvent>(Action<TEvent> onNext)
     {

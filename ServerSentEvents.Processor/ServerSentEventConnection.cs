@@ -6,19 +6,15 @@ namespace ServerSentEvents.Processor;
 
 public class ServerSentEventConnection : IServerSentEventConnection
 {
-    public Guid Guid { get; }
-    //public CancellationToken CancellationToken { get; }
+    public Guid Guid { get; } 
 
-    private readonly HttpResponse _response;
-    //private readonly ServerSentEventChannel _channel;
-    private readonly CancellationToken _cancellationToken;
-    //public Func<bool> RemoveFromConnections { get; set; } = default!;
+    private readonly HttpResponse _response; 
+    private readonly CancellationToken _cancellationToken; 
 
     public ServerSentEventConnection(HttpResponse response, CancellationToken cancellationToken)
     {
         Guid = Guid.NewGuid();
-        _response = response;
-        //_channel = channel;
+        _response = response; 
         _cancellationToken = cancellationToken;
     }
 
@@ -47,68 +43,4 @@ public class ServerSentEventConnection : IServerSentEventConnection
 
         return new ServerSentEventResponse(false, Guid);
     }
-}
-
-
-//PeriodicTimer periodicTimer = default!;
-//bool continueHeartbeat = true;
-
-//public async Task KillHeartbeat()
-//{
-//    continueHeartbeat = false;
-//    await Task.CompletedTask;
-//   // _cancellationToken.
-//}
-
-//public async Task StartHeartbeat(ServerSentEventOptions options, CancellationToken _cancellationToken = default)
-//{
-//    if (options.SendHeartBeat)
-//    {
-//        try
-//        {
-
-//            //using var periodicTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(options.HeartBeatMilliseconds));
-
-//            periodicTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(options.HeartBeatMilliseconds));
-
-//            while (await periodicTimer.WaitForNextTickAsync(_cancellationToken) && continueHeartbeat)
-//            {
-//                await _channel.WriteAsync(new ServerSentEventHeartBeat());
-//                ////var result = await this.SendAsync(new ServerSentEventHeartBeat());
-//                //if (result.Success is false)
-//                //{
-//                //    continueHeartbeat = false;
-//                //   // this.RemoveFromConnections.Invoke();
-//                //}
-//            }
-//        }
-//        catch (OperationCanceledException)
-//        {
-//            // Handle cancellation, but in this case, it's triggered internally
-
-//            periodicTimer.Dispose();
-//        }
-//    }
-//}
-
-//public async Task StartHeartbeat(ServerSentEventOptions options)
-//{
-//    if (options.SendHeartBeat)
-//    {
-//        CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-//        var token = cancellationTokenSource.Token;
-
-//        var periodicTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(options.HeartBeatMilliseconds));
-
-//        while (await periodicTimer.WaitForNextTickAsync(token))
-//        {
-//            var result = await this.SendAsync(new ServerSentEventHeartBeat());
-//            if (result.Success is false)
-//            {
-//                await cancellationTokenSource.CancelAsync();
-//                this.RemoveFromConnections.Invoke();
-//            }
-//            // await channel.WriteAsync(new ServerSentEventHeartBeat());
-//        }
-//    }
-//}
+} 
